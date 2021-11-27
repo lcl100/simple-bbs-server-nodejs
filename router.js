@@ -20,6 +20,10 @@ router.get('/index.html', function (request, response) {
 
 // 渲染login.html页面
 router.get('/login.html', function (request, response) {
+    // 如果处于登录状态，则不渲染login.html而是重定向到index.html
+    if (request.session.user != null) {
+        return response.redirect('/');
+    }
     response.render("login.html");
 });
 
@@ -50,6 +54,10 @@ router.post('/login', async function (request, response) {
 
 // 渲染register.html页面
 router.get('/register.html', function (request, response) {
+    // 如果处于登录状态，则不渲染register.html而是重定向到index.html
+    if (request.session.user != null) {
+        return response.redirect('/');
+    }
     response.render('register.html');
 });
 
@@ -127,6 +135,15 @@ router.get('/logout', function (request, response) {
     request.session.user = null;
     // 并且重定向到首页
     response.redirect('/');
+});
+
+// 判断是否登录
+router.get('/isLogin', function (request, response) {
+    if (request.session.user != null) {
+        response.status(200).send({code: 200, msg: '已登录！', data: true})
+    } else {
+        response.status(200).send({code: 200, msg: '未登录！', data: false});
+    }
 });
 
 router.get('/detail', function (request, response) {
