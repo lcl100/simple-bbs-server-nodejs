@@ -121,6 +121,14 @@ router.post('/register', async function (request, response) {
     response.send({code: 200, msg: "用户注册成功！"});
 });
 
+// 登出请求处理
+router.get('/logout', function (request, response) {
+    // 清除session
+    request.session.user = null;
+    // 并且重定向到首页
+    response.redirect('/');
+});
+
 router.get('/detail', function (request, response) {
     response.render('detail.html');
 });
