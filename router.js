@@ -2,6 +2,7 @@
 var express = require('express');
 var md5 = require('md5');// md5加密模块
 var path = require('path');// 路径处理模块
+var fs = require('fs');// 文件系统模块
 
 // 1.创建一个路由容器
 var router = express.Router();
@@ -73,6 +74,14 @@ router.post('/register', async function (request, response) {
     // 检查用户名是否已经存在
     var checkedUser = await userModel.selectByUsername(postForm.username);
     if (checkedUser !== null) {
+        // 如果用户已经存在，那么刚才上传的头像文件应该删除掉
+        fs.unlink(uploadPath, function (err) {
+            if (err) {
+                console.log(err);
+                return response.status(500).send({code: 500, msg: '头像文件删除失败！'});
+            }
+            console.log('头像文件删除成功！');
+        });
         return response.status(400).send({code: 400, msg: "用户名已经存在！"});
     }
 
@@ -86,7 +95,7 @@ router.post('/register', async function (request, response) {
         registerDate: new Date()
     });
 
-    response.send({code: 500, msg: "用户注册成功！"});
+    response.send({code: 200, msg: "用户注册成功！"});
 });
 
 router.get('/detail', function (request, response) {

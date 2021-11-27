@@ -119,6 +119,7 @@
         formData.append("repassword", document.getElementById("repassword").value);// 确认密码
         formData.append("gender", document.getElementById("gender").value);// 性别
         formData.append('introduction', document.getElementById("introduction").value);// 个人简介
+        // 使用axios发送Ajax请求
         axios({
             method: 'POST',
             url: '/register',
@@ -131,9 +132,27 @@
                 return (status >= 200 && status < 300) || (status === 400) || (status === 500);// 400状态码表示请求参数错误，也让resolve处理；500状态码表示服务端内部错误，也让resolve处理
             }
         }).then(function (response) {
+            // 对响应回来的数据使用Toasts提示框进行显示
             var totalLiveExample = document.getElementById("liveToast");
             var toast = new bootstrap.Toast(totalLiveExample);
-            document.getElementById("toast-body").innerText = response.data.msg;
+            var toastBody = document.getElementById("toast-body");
+            if (response.status === 200) {
+                toastBody.innerHTML = "<span class='text-primary'>" + response.data.msg + ", 将在10秒后自动前往登录页！" + "</span>";
+                // 注册成功则清除表单数据并且在10秒后重定向到登录页面
+                document.getElementById("avatar").value = null;
+                document.getElementById("username").value = null;
+                document.getElementById("password").value = null;
+                document.getElementById("repassword").value = null;
+                document.getElementById("gender").value = null;
+                document.getElementById("introduction").value = null;
+                setTimeout(function () {
+                    window.location.href = './login.html';
+                }, 10 * 1000);
+            } else if (response.status === 400) {
+                toastBody.innerHTML = "<span class='text-warning'>" + response.data.msg + "</span>";
+            } else if (response.status === 500) {
+                toastBody.innerHTML = "<span class='text-danger'>" + response.data.msg + "</span>";
+            }
             toast.show();
             console.log(response.data);
         }).catch(function (reason) {
