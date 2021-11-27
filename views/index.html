@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <!-- 引入bootstrap相关资源 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <!-- 引入本页面需要用到的css -->
+    <link rel="stylesheet" href="../public/css/index.css"/>
+  </head>
+  <body>
+    <!-- 顶部导航栏 0 -->
+    <nav id="navbar" class="navbar navbar-light bg-light px-3">
+      <a class="navbar-brand" href="./index.html">Blog</a>
+      <ul class="nav nav-pills">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">
+            <i class="bi bi-list"></i>
+          </a>
+          <ul class="dropdown-menu">
+            <!-- 如果未登录则显示下面的列表项 -->
+            <li><a class="dropdown-item" href="login.html">登录</a></li>
+            <li><a class="dropdown-item" href="register.html">注册</a></li>
+            <!-- 如果已登录，则显示下面的列表项 -->
+            <li><a class="dropdown-item" href="./index.html">个人主页</a></li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li><a class="dropdown-item" href="publish.html">发表话题</a></li>
+            <li><a class="dropdown-item" href="/logout">登出</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+    <!-- 顶部导航栏 1 -->
+    <!-- 中间内容 -->
+    <div class="container" id="middle-content">
+      <!-- 每一项 0 -->
+      <div class="row justify-content-md-center message-item">
+        <!-- 发言人头像 -->
+        <div class="col-sm-2">
+          <a href="/author?id=123">
+            <img src="../public/img/avatar.jpg" class="img-thumbnail avatar" alt="头像" data-bs-toggle="tooltip"
+                 data-bs-placement="bottom" title="123456 | 女" />
+          </a>
+        </div>
+        <!-- 发言人发布的内容面板 -->
+        <div class="col-sm-10">
+          <div class="card">
+            <div class="card-body">
+              <div class="container">
+                <!-- 标题 -->
+                <div class="row">
+                  <h5 class="card-title">
+                    <a href="./detail.html">myblog</a>
+                  </h5>
+                </div>
+                <!-- 具体内容 -->
+                <div class="row card-content">
+                  <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                </div>
+                <!-- 其他 -->
+                <div class="row">
+                  <!-- 发布日期 -->
+                  <div class="col-sm-4">
+                    <p class="text-start"><span>2021-11-20 17:16</span></p>
+                  </div>
+                  <div class="col-sm-5"></div>
+                  <div class="col-sm-3">
+                    <!-- 浏览次数 -->
+                    <span class="view">浏览(2)</span>
+                    <!-- 留言数 -->
+                    <span class="say">留言(0)</span>
+                    <!-- 删除和编辑操作 -->
+                    <ul class="nav nav-pills edit">
+                      <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"></a>
+                        <ul class="dropdown-menu">
+                          <!-- 如果未登录则显示下面的列表项 -->
+                          <li>
+                            <a class="dropdown-item" href="publish.html">编辑</a>
+                          </li>
+                          <li>
+                            <a class="dropdown-item" href="#">删除</a>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 每一项 1 -->
+      <!-- 每一项 0 -->
+      <div class="row justify-content-md-center message-item">
+        <!-- 发言人头像 -->
+        <div class="col-sm-2">
+          <a href="/author?id=123">
+            <img src="../public/img/avatar.jpg" class="img-thumbnail avatar" alt="头像" data-bs-toggle="tooltip"
+                 data-bs-placement="bottom" title="123456 | 女" />
+          </a>
+        </div>
+        <!-- 发言人发布的内容面板 -->
+        <div class="col-sm-10">
+          <div class="card">
+            <div class="card-body">
+              <div class="container">
+                <!-- 标题 -->
+                <div class="row">
+                  <h5 class="card-title">
+                    <a href="./detail.html">myblog</a>
+                  </h5>
+                </div>
+                <!-- 具体内容 -->
+                <div class="row card-content">
+                  <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                </div>
+                <!-- 其他 -->
+                <div class="row">
+                  <!-- 发布日期 -->
+                  <div class="col-sm-4">
+                    <p class="text-start"><span>2021-11-20 17:16</span></p>
+                  </div>
+                  <div class="col-sm-5"></div>
+                  <div class="col-sm-3">
+                    <!-- 浏览次数 -->
+                    <span class="view">浏览(2)</span>
+                    <!-- 留言数 -->
+                    <span class="say">留言(0)</span>
+                    <!-- 删除和编辑操作 -->
+                    <ul class="nav nav-pills edit">
+                      <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"></a>
+                        <ul class="dropdown-menu">
+                          <!-- 如果未登录则显示下面的列表项 -->
+                          <li>
+                            <a class="dropdown-item" href="publish.html">编辑</a>
+                          </li>
+                          <li>
+                            <a class="dropdown-item" href="#">删除</a>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 每一项 1 -->
+      <!-- 每一项 0 -->
+      <div class="row justify-content-md-center message-item">
+        <!-- 发言人头像 -->
+        <div class="col-sm-2">
+          <a href="/author?id=123">
+            <img src="../public/img/avatar.jpg" class="img-thumbnail avatar" alt="头像" data-bs-toggle="tooltip"
+                 data-bs-placement="bottom" title="123456 | 女" />
+          </a>
+        </div>
+        <!-- 发言人发布的内容面板 -->
+        <div class="col-sm-10">
+          <div class="card">
+            <div class="card-body">
+              <div class="container">
+                <!-- 标题 -->
+                <div class="row">
+                  <h5 class="card-title">
+                    <a href="./detail.html">myblog</a>
+                  </h5>
+                </div>
+                <!-- 具体内容 -->
+                <div class="row card-content">
+                  <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                </div>
+                <!-- 其他 -->
+                <div class="row">
+                  <!-- 发布日期 -->
+                  <div class="col-sm-4">
+                    <p class="text-start"><span>2021-11-20 17:16</span></p>
+                  </div>
+                  <div class="col-sm-5"></div>
+                  <div class="col-sm-3">
+                    <!-- 浏览次数 -->
+                    <span class="view">浏览(2)</span>
+                    <!-- 留言数 -->
+                    <span class="say">留言(0)</span>
+                    <!-- 删除和编辑操作 -->
+                    <ul class="nav nav-pills edit">
+                      <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"></a>
+                        <ul class="dropdown-menu">
+                          <!-- 如果未登录则显示下面的列表项 -->
+                          <li>
+                            <a class="dropdown-item" href="publish.html">编辑</a>
+                          </li>
+                          <li>
+                            <a class="dropdown-item" href="#">删除</a>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 每一项 1 -->
+    </div>
+  </body>
+  <script>
+    // 为了能够使用tooltip, 需要引入下面的JavaScript代码
+    var tooltipTriggerList = Array.prototype.slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+  </script>
+</html>

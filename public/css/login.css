@@ -1,0 +1,76 @@
+#app {
+  width: 500px;
+  height: 400px;
+  background: white;
+  border: 1px solid #cce2ff;
+  ;
+  border-radius: 1px;
+  /* 居中0 */
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  /* 居中1 */
+}
+
+#app #touxiang {
+  height: 130px;
+  /* 设置包裹图片盒子的高度 */
+  width: 130px;
+  /* 设置包裹图片盒子的宽度，宽高相等是一个正方形盒子 */
+  border: 1px solid #eee;
+  /* 给包裹图片盒子设置一些边界 */
+  border-radius: 50%;
+  /* 把包裹图片盒子设置一个圆形盒子 */
+  padding: 10px;
+  /* 设置内边距 */
+  box-shadow: 0 0 10px #ddd;
+  /* 再设置点阴影 */
+  background-color: #fff;
+  /* 设置盒子的背景色 */
+  /* 设置包裹图片盒子的位置0 */
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* 设置包裹图片盒子的位置1 */
+}
+
+#app #touxiang img {
+  width: 100%;
+  /* 设置背景图片宽百分之百 */
+  height: 100%;
+  border-radius: 50%;
+  /* 设置背景图片也是圆形 */
+  background: #eee;
+}
+
+#navbar ul {
+  margin-right:100px;
+}
+
+.navbar-brand {
+  margin-left: 50px;
+}
+
+a.nav-link {
+  color: black;
+}
+
+a.nav-link i {
+  font-size: 25px;
+}
+
+div.username-input {
+  margin-top: 40px;
+  width: 400px;
+  margin-left: 45px;
+}
+
+#tip-text {
+  line-height: 45.6px;
+  margin-right: 20px
+}
+
+#login-button {
+  padding: 10px 25px;
+}

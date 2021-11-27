@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- 引入bootstrap相关资源 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous"/>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"/>
+    <!-- 引入axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- 导入本页面需要的css -->
+    <link rel="stylesheet" href="../public/css/register.css"/>
+</head>
+<body>
+<!-- 顶部导航栏 0 -->
+<nav id="navbar" class="navbar navbar-light bg-light px-3">
+    <a class="navbar-brand" href="./index.html">Blog</a>
+    <ul class="nav nav-pills">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">
+                <i class="bi bi-list"></i>
+            </a>
+            <ul class="dropdown-menu">
+                <!-- 如果未登录则显示下面的列表项 -->
+                <li><a class="dropdown-item" href="./login.html">登录</a></li>
+                <li><a class="dropdown-item" href="./register.html">注册</a></li>
+                <!-- 如果已登录，则显示下面的列表项 -->
+                <li><a class="dropdown-item" href="./index.html">个人主页</a></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" href="./publish.html">发表话题</a></li>
+                <li><a class="dropdown-item" href="/logout">登出</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>
+<!-- 顶部导航栏 1 -->
+<!-- 中间表单 0 -->
+<div id="app" class="shadow-lg p-3 mb-5 bg-white rounded">
+    <!-- 注册表单 0 -->
+    <form id="register-form">
+        <!-- 账号输入框 -->
+        <div class="input-group flex-nowrap username-input">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+            </div>
+            <input type="text" class="form-control" placeholder="请输入账号" name="username" id="username">
+        </div>
+        <!-- 密码输入框 -->
+        <div class="input-group flex-nowrap username-input">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+            </div>
+            <input type="password" class="form-control" placeholder="请输入密码" name="password" id="password">
+        </div>
+        <!-- 确认密码输入框 -->
+        <div class="input-group flex-nowrap username-input">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+            </div>
+            <input type="password" class="form-control" placeholder="请确认密码" name="repassword" id="repassword">
+        </div>
+        <!-- 性别下拉列表框 -->
+        <div class="input-group flex-nowrap username-input">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="bi bi-gender-ambiguous"></i></span>
+            </div>
+            <select class="form-select" id="gender">
+                <option selected value="1">男</option>
+                <option value="0">女</option>
+                <option value="-1">保密</option>
+            </select>
+        </div>
+        <!-- 头像选择 -->
+        <div class="input-group flex-nowrap username-input">
+            <input type="file" class="form-control" name="avatar" id="avatar">
+        </div>
+        <!-- 个人简介 -->
+        <div class="form-group flex-nowrap username-input">
+            <textarea class="form-control" rows="3" placeholder="个人简介" id="introduction"></textarea>
+        </div>
+        <!-- 注册按钮 -->
+        <div class="input-group flex-nowrap username-input" id="register-div">
+            <span id="tip-text">如果已有账户，请前往<a href="/login.html">登录</a></span>
+            <input type="button" value="注册" class="btn btn-primary" id="register-button"/>
+        </div>
+    </form>
+    <!-- 注册表单 1 -->
+</div>
+<!-- 中间表单 1 -->
+<!-- 提示组件 0 -->
+<div class="position-fixed top-0 start-50 translate-middle-x" style="z-index: 11">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">提示</strong>
+            <small>刚刚</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            <p id="toast-body"></p>
+        </div>
+    </div>
+</div>
+<!-- 提示组件 1 -->
+</body>
+<script>
+    // 注册按钮的注册事件
+    document.getElementById("register-button").onclick = function () {
+        // 创建FormData对象存储POST提交的数据
+        var formData = new FormData();
+        formData.append("avatar", document.getElementById("avatar").files[0]);// 头像文件
+        formData.append("username", document.getElementById("username").value);// 用户名
+        formData.append("password", document.getElementById("password").value);// 密码
+        formData.append("repassword", document.getElementById("repassword").value);// 确认密码
+        formData.append("gender", document.getElementById("gender").value);// 性别
+        formData.append('introduction', document.getElementById("introduction").value);// 个人简介
+        axios({
+            method: 'POST',
+            url: '/register',
+            data: formData,
+            headers: {
+                // 要使用Ajax方式进行POST提交上传文件必须设置此请求头，等价于表单提交中的enctype="multipart/form-data"设置
+                "Content-Type": "multipart/form-data"
+            },
+            validateStatus: function (status) {
+                return (status >= 200 && status < 300) || (status === 400) || (status === 500);// 400状态码表示请求参数错误，也让resolve处理；500状态码表示服务端内部错误，也让resolve处理
+            }
+        }).then(function (response) {
+            var totalLiveExample = document.getElementById("liveToast");
+            var toast = new bootstrap.Toast(totalLiveExample);
+            document.getElementById("toast-body").innerText = response.data.msg;
+            toast.show();
+            console.log(response.data);
+        }).catch(function (reason) {
+            console.log(reason);
+        })
+    }
+</script>
+</html>

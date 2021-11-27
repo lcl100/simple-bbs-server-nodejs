@@ -1,0 +1,73 @@
+#navbar ul {
+  margin-right: 100px;
+}
+
+.navbar-brand {
+  margin-left: 50px;
+}
+
+a.nav-link {
+  color: black;
+}
+
+a.nav-link i {
+  font-size: 25px;
+}
+
+.message-item {
+  margin-top: 10px;
+  padding-bottom: 10px;
+}
+
+div#middle-content {
+  width: 60%;
+}
+
+div#middle-content img.avatar {
+  width: 70px;
+  height: 70px;
+  float: right;
+}
+
+h5.card-title a {
+  color: rgb(79, 192, 141);
+  text-decoration: none;
+}
+
+div.card-content {
+  padding-top: 10px;
+  margin-top: 10px;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+p.text-start {
+  line-height: 40px;
+  height: 40px;
+}
+
+p.text-start span {
+  font-size: 13px;
+  margin-right: 5px;
+  color: #999;
+}
+
+div.col-sm-3 span.view {
+  font-size: 13px;
+  color: #999;
+}
+
+div.col-sm-3 span.say {
+  font-size: 13px;
+  color: #999;
+}
+
+ul.edit {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+}
+
+ul.edit li.nav-item a.nav-link {
+  color: black;
+}

@@ -1,0 +1,30 @@
+#navbar ul {
+  margin-right: 100px;
+}
+
+.navbar-brand {
+  margin-left: 50px;
+}
+
+a.nav-link {
+  color: black;
+}
+
+a.nav-link i {
+  font-size: 25px;
+}
+
+.publish-topic-panel {
+  margin-top: 10px;
+  padding-bottom: 10px;
+}
+
+.publish-topic-panel .col-sm-2 a img {
+  width: 70px;
+  height: 70px;
+  float: right;
+}
+
+.required {
+  color: red;
+}
