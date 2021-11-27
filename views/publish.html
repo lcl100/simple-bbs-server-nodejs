@@ -1,93 +1,146 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8">
     <!-- 引入bootstrap相关资源 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
-      crossorigin="anonymous" />
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-      crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous"/>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <!-- 引入axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- 引入本页面需要的css -->
     <link rel="stylesheet" href="../public/css/publish.css">
-  </head>
-  <body>
-    <!-- 顶部导航栏 0 -->
-    <nav id="navbar" class="navbar navbar-light bg-light px-3">
-      <a class="navbar-brand" href="./index.html">Blog</a>
-      <ul class="nav nav-pills">
+</head>
+<body>
+<!-- 顶部导航栏 0 -->
+<nav id="navbar" class="navbar navbar-light bg-light px-3">
+    <a class="navbar-brand" href="./index.html">Blog</a>
+    <ul class="nav nav-pills">
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">
-            <i class="bi bi-list"></i>
-          </a>
-          <ul class="dropdown-menu">
-            <!-- 如果未登录则显示下面的列表项 -->
-            <li><a class="dropdown-item" href="./login.html">登录</a></li>
-            <li><a class="dropdown-item" href="register.html">注册</a></li>
-            <!-- 如果已登录，则显示下面的列表项 -->
-            <li><a class="dropdown-item" href="./index.html">个人主页</a></li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-            <li><a class="dropdown-item" href="./publish.html">发表话题</a></li>
-            <li><a class="dropdown-item" href="/logout">登出</a></li>
-          </ul>
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">
+                <i class="bi bi-list"></i>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="./index.html">个人主页</a></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" href="./publish.html">发表话题</a></li>
+                <li><a class="dropdown-item" href="/logout">登出</a></li>
+            </ul>
         </li>
-      </ul>
-    </nav>
-    <!-- 顶部导航栏 1 -->
-    <!-- 发布话题面板 0 -->
-    <div class="container" style="width: 60%;">
-      <!-- 发布话题人头像 -->
-      <div class="row justify-content-md-center publish-topic-panel">
+    </ul>
+</nav>
+<!-- 顶部导航栏 1 -->
+<!-- 发布话题面板 0 -->
+<div class="container" style="width: 60%;">
+    <!-- 发布话题人头像 -->
+    <div class="row justify-content-md-center publish-topic-panel">
         <div class="col-sm-2">
-          <a href="/author?id=123">
-            <img src="../public/img/avatar.jpg" class="img-thumbnail" alt="头像" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                 title="123456 | 女" /></a>
+            <a href="#" id="publisher-link">
+                <img src="" class="img-thumbnail" alt="头像" data-bs-toggle="tooltip"
+                     data-bs-placement="bottom" id="publisher-avatar"
+                     title=""/></a>
         </div>
         <!-- 发布话题表单 -->
         <div class="col-sm-10">
-          <div class="card">
-            <div class="card-body">
-              <div class="container">
-                <form>
-                  <!-- 标题输入框 -->
-                  <div class="mb-3">
-                    <label for="titleInput" class="form-label">
-                      <b>标题</b>
-                      <span class="required">*</span>
-                    </label>
-                    <input type="text" class="form-control" id="titleInput" name="title">
-                  </div>
-                  <!-- 内容文本域 -->
-                  <div class="mb-3">
-                    <label for="contentInput" class="form-label">
-                      <b>内容</b>
-                      <span class="required">*</span>
-                    </label>
-                    <textarea class="form-control" rows="10" id="contentInput" name="content"></textarea>
-                  </div>
-                  <!-- 发布按钮 -->
-                  <button type="submit" class="btn btn-primary">发布</button>
-                </form>
-              </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="container">
+                        <form>
+                            <!-- 标题输入框 -->
+                            <div class="mb-3">
+                                <label for="title" class="form-label">
+                                    <b>标题</b>
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="title" name="title">
+                            </div>
+                            <!-- 内容文本域 -->
+                            <div class="mb-3">
+                                <label for="content" class="form-label">
+                                    <b>内容</b>
+                                    <span class="required">*</span>
+                                </label>
+                                <textarea class="form-control" rows="10" id="content" name="content"></textarea>
+                            </div>
+                            <!-- 发布按钮 -->
+                            <button type="button" class="btn btn-primary" id="publish-button">发布</button>
+                        </form>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-    <!-- 发布话题面板 1 -->
-  </body>
-  <script>
+</div>
+<!-- 发布话题面板 1 -->
+<!-- 提示组件 0 -->
+<div class="position-fixed top-0 start-50 translate-middle-x" style="z-index: 11">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">提示</strong>
+            <small>刚刚</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            <p id="toast-body"></p>
+        </div>
+    </div>
+</div>
+<!-- 提示组件 1 -->
+</body>
+<script>
     // 为了能够使用tooltip, 需要引入下面的JavaScript代码
     var tooltipTriggerList = Array.prototype.slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
     // 为了能够使用popover, 需要引入下面的JavaScript代码
     var popoverTriggerList = Array.prototype.slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
-    var popoverList = popoverTriggerList.map(function(popoverTriggerEl) {
-      return new bootstrap.Popover(popoverTriggerEl)
-    })
-  </script>
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl)
+    });
+
+    // 初始化当前登录用户信息
+    window.onload = async function () {
+        var user = await axios.get('/getUser');
+        console.log(user.data);
+        document.getElementById('publisher-link').setAttribute('href', '/index.html?id=' + user.data.data._id);
+        document.getElementById('publisher-avatar').setAttribute('src', user.data.data.avatar);
+        document.getElementById('publisher-avatar').setAttribute('data-bs-original-title', user.data.data.username + " | " + user.data.data.gender);
+    };
+
+    // 发布按钮事件
+    document.getElementById('publish-button').onclick = async function () {
+        var response = await axios.post('/publish', {
+            title: document.getElementById('title').value,
+            content: document.getElementById('content').value
+        }, {
+            validateStatus: function (status) {
+                // 400状态码表示请求参数错误，也让resolve处理；500状态码表示服务端内部错误，也让resolve处理
+                return (status >= 200 && status < 300) || (status === 400) || (status === 500);
+            }
+        });
+        // 对响应回来的数据使用Toasts提示框进行显示
+        var totalLiveExample = document.getElementById("liveToast");
+        var toast = new bootstrap.Toast(totalLiveExample);
+        var toastBody = document.getElementById("toast-body");
+        if (response.status === 200) {
+            toastBody.innerHTML = "<span class='text-primary'>" + response.data.msg + "</span>";
+            // 帖子发布成功则清除表单数据
+            document.getElementById("title").value = null;
+            document.getElementById("content").value = null;
+        } else if (response.status === 400) {
+            toastBody.innerHTML = "<span class='text-warning'>" + response.data.msg + "</span>";
+        } else if (response.status === 500) {
+            toastBody.innerHTML = "<span class='text-danger'>" + response.data.msg + "</span>";
+        }
+        toast.show();
+        console.log(response.data);
+    };
+</script>
 </html>

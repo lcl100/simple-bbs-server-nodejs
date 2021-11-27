@@ -236,7 +236,6 @@
         axios.get('/isLogin').then(function (response) {
             console.log(response.data);
             if (response.data.data) {
-                console.log('登录')
                 // 如果处于登录状态，则让class='login-show-item'的标签处于隐藏状态
                 var loginItems = document.getElementsByClassName('login-show-item');
                 for (var i in loginItems) {

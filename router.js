@@ -7,6 +7,7 @@ var fs = require('fs');// 文件系统模块
 // 1.创建一个路由容器
 var router = express.Router();
 var userModel = require('./models/user.js');
+var noteModel = require('./models/note');
 
 router.get('/', function (request, response) {
     // 如果访问"/"则重定向到"/index.html"中
@@ -124,9 +125,12 @@ router.post('/register', async function (request, response) {
         gender: postForm.gender,
         introduction: postForm.introduction,
         registerDate: new Date()
+    }).then(function (result) {
+        response.send({code: 200, msg: "用户注册成功！"});
+    }).catch(function (reason) {
+        console.log(reason);
+        response.status(500).send({code: 500, msg: '用户注册失败！'});
     });
-
-    response.send({code: 200, msg: "用户注册成功！"});
 });
 
 // 登出请求处理
@@ -139,6 +143,7 @@ router.get('/logout', function (request, response) {
 
 // 判断是否登录
 router.get('/isLogin', function (request, response) {
+    // 根据session中是否有用户来判断是否处于登录状态
     if (request.session.user != null) {
         response.status(200).send({code: 200, msg: '已登录！', data: true})
     } else {
@@ -146,25 +151,66 @@ router.get('/isLogin', function (request, response) {
     }
 });
 
+// 获取登录用户信息
+router.get('/getUser', function (request, response) {
+    if (request.session.user == null) {
+        return response.status(400).send({code: 400, msg: '未登录！', data: null});
+    } else {
+        var user = request.session.user[0];
+        user.password = null;// 密码不能对外暴露
+        user.gender = parseInt(user.gender) === -1 ? '保密' : (parseInt(user.gender) === 0 ? '男' : '女');// 将性别由数字转换成文字显示
+        return response.status(200).send({code: 200, msg: '成功获取到用户信息！', data: user});
+    }
+});
+
 router.get('/detail', function (request, response) {
     response.render('detail.html');
 });
 
+// 渲染publish.html页面
 router.get('/publish.html', function (request, response) {
     // 该页面只有登录用户才能访问，所以验证session判断是否登录
     if (request.session.user != null) {
+        // 如果登录了则渲染publish.html页面
         response.render('publish.html');
     } else {
-        response.status(400).send('请登录');
+        // 如果没有登录则重定向到首页
+        return response.redirect('/');
     }
 });
 
-router.get('/publish', function (request, response) {
-    response.send('发布话题...');
-});
+router.post('/publish', function (request, response) {
+    // 判断是否登录
+    if (request.session.user === null) {
+        return response.status(400).send({code: 400, msg: '未登录！', data: null});
+    } else {
+        // 获取POST请求提交的数据
+        var postForm = request.body;
+        console.log(postForm);
 
-router.get('/test', async function (request, response) {
-    response.send(request.session.user);
+        // 对提交的数据进行校验
+        if (postForm.title === null || postForm.title.length < 3 || postForm.title.length > 30) {
+            return response.status(400).send({code: 400, msg: '标题不能为空并且字符个数在3到30之间！'});
+        }
+        if (postForm.content === null || postForm.content.length === 0) {
+            return response.status(400).send({code: 400, msg: '话题内容不能为空！'});
+        }
+
+        // 发布帖子
+        var note = {
+            userId: request.session.user[0]._id,
+            title: postForm.title,
+            content: postForm.content,
+            insertDate: new Date()
+        };
+        console.log(note);
+        noteModel.insert(note).then(function (result) {
+            response.send({code: 200, msg: "帖子发布成功！"});
+        }).catch(function (reason) {
+            console.log(reason);
+            response.status(500).send({code: 500, msg: '帖子发布失败！'});
+        });
+    }
 });
 
 // 3.把router暴露出去
