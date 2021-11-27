@@ -8,6 +8,7 @@ var fs = require('fs');// 文件系统模块
 var router = express.Router();
 var userModel = require('./models/user.js');
 var noteModel = require('./models/note');
+var commentModel = require('./models/comment');
 
 router.get('/', function (request, response) {
     // 如果访问"/"则重定向到"/index.html"中
@@ -15,8 +16,50 @@ router.get('/', function (request, response) {
 });
 
 // 渲染首页
-router.get('/index.html', function (request, response) {
-    response.render('index.html');
+router.get('/index.html', async function (request, response) {
+    // 涉及mongodb多表查询，但这里利用的是单表查询，在这里进行了组合
+    var notes = null;
+    // 根据是否有author参数来决定是显示所有帖子还是显示某个用户的帖子
+    if (request.query.author != null) {
+        var userId = request.query.author;
+        notes = await noteModel.selectByUserId(userId);
+    } else {
+        var notes = await noteModel.selectAll();
+    }
+    var newNotes = notes.map(async item => {
+        var user = await userModel.selectById(item.userId);
+        console.log(item);
+        return {
+            note: {
+                id: item._id.toString().replace('"', ''),// 会多一对双引号，所以特殊处理
+                userId: item.userId !== undefined ? item.userId.toString().replace('"', '') : null,
+                title: item.title,
+                content: item.content,
+                viewCount: item.viewCount !== undefined ? item.viewCount : 0,
+                insertDate: formatDate(item.insertDate)
+            },
+            user: {
+                id: user._id.toString().replace('"', ''),
+                username: user.username,
+                avatar: user.avatar,
+                gender: user.gender === -1 ? '保密' : (user.gender === 0 ? '男' : '女'),
+                introduction: user.introduction,
+                registerDate: formatDate(user.registerDate)
+            },
+            comment: {
+                commentCount: await commentModel.getCommentCountByNoteId(item._id)// 该篇帖子下的留言评论数
+            }
+        }
+    });
+    var res = [];
+    for (var i in newNotes) {
+        res.push(await newNotes[i])
+    }
+    response.render('index.html', {
+        isLogin: request.session.user != null,
+        notes: res,
+        user: request.session.user != null ? request.session.user[0] : null
+    });
 });
 
 // 渲染login.html页面
@@ -67,8 +110,6 @@ router.post('/register', async function (request, response) {
     // 获取请求数据
     var files = request.files;// POST请求上传的头像文件
     var postForm = request.body;// POST请求提交的数据
-    console.log(files);
-    console.log(postForm);
 
     // 对提交的数据进行校验
     if (postForm.username === null || postForm.username.length < 3) {
@@ -163,16 +204,23 @@ router.get('/getUser', function (request, response) {
     }
 });
 
-router.get('/detail', function (request, response) {
+// 渲染detail.html页面
+router.get('/detail.html', function (request, response) {
     response.render('detail.html');
 });
 
 // 渲染publish.html页面
-router.get('/publish.html', function (request, response) {
+router.get('/publish.html', async function (request, response) {
     // 该页面只有登录用户才能访问，所以验证session判断是否登录
     if (request.session.user != null) {
-        // 如果登录了则渲染publish.html页面
-        response.render('publish.html');
+        // 如果有id参数表示要编辑帖子；如果没有id参数则表示要发布帖子
+        if (request.query.id !== null) {
+            var note = await noteModel.selectById(request.query.id);
+            response.render('publish.html', {note: note})
+        } else {
+            // 如果登录了则渲染publish.html页面
+            response.render('publish.html');
+        }
     } else {
         // 如果没有登录则重定向到首页
         return response.redirect('/');
@@ -186,7 +234,6 @@ router.post('/publish', function (request, response) {
     } else {
         // 获取POST请求提交的数据
         var postForm = request.body;
-        console.log(postForm);
 
         // 对提交的数据进行校验
         if (postForm.title === null || postForm.title.length < 3 || postForm.title.length > 30) {
@@ -201,9 +248,9 @@ router.post('/publish', function (request, response) {
             userId: request.session.user[0]._id,
             title: postForm.title,
             content: postForm.content,
+            viewCount: 0,
             insertDate: new Date()
         };
-        console.log(note);
         noteModel.insert(note).then(function (result) {
             response.send({code: 200, msg: "帖子发布成功！"});
         }).catch(function (reason) {
@@ -212,6 +259,49 @@ router.post('/publish', function (request, response) {
         });
     }
 });
+
+// 编辑帖子
+router.post('/note/edit', function (request, response) {
+    console.log(request.body);
+    // 判断是否登录
+    if (request.session.user === null) {
+        return response.status(400).send({code: 400, msg: '未登录！', data: null});
+    } else {
+        // 获取POST请求提交的数据
+        var postForm = request.body;
+
+        // 对提交的数据进行校验
+        if (postForm.title === null || postForm.title.length < 3 || postForm.title.length > 30) {
+            return response.status(400).send({code: 400, msg: '标题不能为空并且字符个数在3到30之间！'});
+        }
+        if (postForm.content === null || postForm.content.length === 0) {
+            return response.status(400).send({code: 400, msg: '话题内容不能为空！'});
+        }
+
+        // 更新帖子
+        var note = {
+            userId: request.session.user[0]._id,
+            title: postForm.title,
+            content: postForm.content,
+            viewCount: request.body.viewCount,
+            insertDate: new Date()
+        };
+        var id = request.body.id.toString().replace(/"/g, '');// 如果id中存在双引号，则无法更新成功，所以要进行处理
+        noteModel.updateById(id, note).then(function (result) {
+            response.send({code: 200, msg: '帖子更新成功！'});
+        }).catch(function (reason) {
+            console.log(reason);
+            response.status(500).send({code: 500, msg: '帖子更新失败！'});
+        });
+    }
+});
+
+function formatDate(date) {
+    if (date !== undefined) {
+        return date.getFullYear() + '-' + date.getMonth() + '-' + date.getDay() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
+    }
+    return null;
+}
 
 // 3.把router暴露出去
 module.exports = router;

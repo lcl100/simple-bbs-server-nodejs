@@ -19,6 +19,11 @@ var noteSchema = mongoose.Schema({
         type: String,
         require: true
     },
+    // 帖子浏览数
+    viewCount:{
+        type:Number,
+        require:0
+    },
     // 插入日期
     insertDate: {
         type: Date,
@@ -50,12 +55,12 @@ module.exports = {
      */
     selectAll: function () {
         return new Promise(function (resolve, reject) {
-            Note.find(function (err, ret) {
+            Note.find(function (err, docs) {
                 if (err) {
                     reject(err);
                 }
-                resolve(ret);
-            })
+                resolve(docs);
+            });
         });
     },
     /**

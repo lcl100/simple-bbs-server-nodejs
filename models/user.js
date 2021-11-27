@@ -40,6 +40,7 @@ var userSchema = mongoose.Schema({
 var User = mongoose.model('User', userSchema);
 
 module.exports = {
+    User:User,
     /**
      * 插入新用户
      * @param user 用户对象

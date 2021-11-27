@@ -52,13 +52,18 @@
                 <div class="card-body">
                     <div class="container">
                         <form>
+                            <!-- 该帖子的id -->
+                            <input type="text" name="id" id="id" value="{{note!=null?note._id:null}}" hidden>
+                            <!-- 该帖子的浏览量 -->
+                            <input type="text" name="viewCount" id="viewCount" value="{{note!=null?note.viewCount:null}}" hidden>
                             <!-- 标题输入框 -->
                             <div class="mb-3">
                                 <label for="title" class="form-label">
                                     <b>标题</b>
                                     <span class="required">*</span>
                                 </label>
-                                <input type="text" class="form-control" id="title" name="title">
+                                <input type="text" class="form-control" id="title" name="title"
+                                       value="{{note!=null?note.title:null}}">
                             </div>
                             <!-- 内容文本域 -->
                             <div class="mb-3">
@@ -66,10 +71,14 @@
                                     <b>内容</b>
                                     <span class="required">*</span>
                                 </label>
-                                <textarea class="form-control" rows="10" id="content" name="content"></textarea>
+                                <textarea class="form-control" rows="10" id="content" name="content">{{note!=null?note.content:null}}</textarea>
                             </div>
+                            {{if note}}
+                            <button type="button" class="btn btn-success" id="edit-button">编辑</button>
+                            {{else}}
                             <!-- 发布按钮 -->
                             <button type="button" class="btn btn-primary" id="publish-button">发布</button>
+                            {{/if}}
                         </form>
                     </div>
                 </div>
@@ -95,12 +104,12 @@
 </body>
 <script>
     // 为了能够使用tooltip, 需要引入下面的JavaScript代码
-    var tooltipTriggerList = Array.prototype.slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipTriggerList = Array.prototype.slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl)
     });
     // 为了能够使用popover, 需要引入下面的JavaScript代码
-    var popoverTriggerList = Array.prototype.slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverTriggerList = Array.prototype.slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
     var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
         return new bootstrap.Popover(popoverTriggerEl)
     });
@@ -115,32 +124,65 @@
     };
 
     // 发布按钮事件
-    document.getElementById('publish-button').onclick = async function () {
-        var response = await axios.post('/publish', {
-            title: document.getElementById('title').value,
-            content: document.getElementById('content').value
-        }, {
-            validateStatus: function (status) {
-                // 400状态码表示请求参数错误，也让resolve处理；500状态码表示服务端内部错误，也让resolve处理
-                return (status >= 200 && status < 300) || (status === 400) || (status === 500);
+    if (document.getElementById('publish-button') !== null) {
+        document.getElementById('publish-button').onclick = async function () {
+            var response = await axios.post('/publish', {
+                title: document.getElementById('title').value,
+                content: document.getElementById('content').value
+            }, {
+                validateStatus: function (status) {
+                    // 400状态码表示请求参数错误，也让resolve处理；500状态码表示服务端内部错误，也让resolve处理
+                    return (status >= 200 && status < 300) || (status === 400) || (status === 500);
+                }
+            });
+            // 对响应回来的数据使用Toasts提示框进行显示
+            var totalLiveExample = document.getElementById("liveToast");
+            var toast = new bootstrap.Toast(totalLiveExample);
+            var toastBody = document.getElementById("toast-body");
+            if (response.status === 200) {
+                toastBody.innerHTML = "<span class='text-primary'>" + response.data.msg + "</span>";
+                // 帖子发布成功则清除表单数据
+                document.getElementById("title").value = null;
+                document.getElementById("content").value = null;
+            } else if (response.status === 400) {
+                toastBody.innerHTML = "<span class='text-warning'>" + response.data.msg + "</span>";
+            } else if (response.status === 500) {
+                toastBody.innerHTML = "<span class='text-danger'>" + response.data.msg + "</span>";
             }
-        });
-        // 对响应回来的数据使用Toasts提示框进行显示
-        var totalLiveExample = document.getElementById("liveToast");
-        var toast = new bootstrap.Toast(totalLiveExample);
-        var toastBody = document.getElementById("toast-body");
-        if (response.status === 200) {
-            toastBody.innerHTML = "<span class='text-primary'>" + response.data.msg + "</span>";
-            // 帖子发布成功则清除表单数据
-            document.getElementById("title").value = null;
-            document.getElementById("content").value = null;
-        } else if (response.status === 400) {
-            toastBody.innerHTML = "<span class='text-warning'>" + response.data.msg + "</span>";
-        } else if (response.status === 500) {
-            toastBody.innerHTML = "<span class='text-danger'>" + response.data.msg + "</span>";
+            toast.show();
+            console.log(response.data);
+        };
+    }
+
+    // 编辑按钮
+    if (document.getElementById('edit-button') !== null) {
+        document.getElementById('edit-button').onclick = async function () {
+            var response = await axios.post('/note/edit', {
+                id: document.getElementById('id').value,
+                title: document.getElementById('title').value,
+                content: document.getElementById('content').value,
+                viewCount:document.getElementById('viewCount').value
+            }, {
+                validateStatus: function (status) {
+                    // 400状态码表示请求参数错误，也让resolve处理；500状态码表示服务端内部错误，也让resolve处理
+                    return (status >= 200 && status < 300) || (status === 400) || (status === 500);
+                }
+            });
+            // 对响应回来的数据使用Toasts提示框进行显示
+            var totalLiveExample = document.getElementById("liveToast");
+            var toast = new bootstrap.Toast(totalLiveExample);
+            var toastBody = document.getElementById("toast-body");
+            if (response.status === 200) {
+                toastBody.innerHTML = "<span class='text-primary'>" + response.data.msg + "</span>";
+            } else if (response.status === 400) {
+                toastBody.innerHTML = "<span class='text-warning'>" + response.data.msg + "</span>";
+            } else if (response.status === 500) {
+                toastBody.innerHTML = "<span class='text-danger'>" + response.data.msg + "</span>";
+            }
+            toast.show();
+            console.log(response.data);
         }
-        toast.show();
-        console.log(response.data);
-    };
+    }
+
 </script>
 </html>
