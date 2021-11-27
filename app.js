@@ -2,6 +2,7 @@
 var express = require("express");// express框架
 var bodyParser = require('body-parser');// POST请求体数据处理模块
 var fileUpload = require('express-fileupload');// 文件上传处理模块
+var session = require('express-session');// session处理模块
 // 导入路由router.js
 var router = require('./router');
 
@@ -17,6 +18,14 @@ app.engine('html', require('express-art-template'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(fileUpload());
+// 配置session
+app.use(session({
+    secret: '12345',
+    name: 'session',
+    resave: false,
+    cookie: {maxAge: 60000},
+    saveUninitialized: true
+}));
 
 // 把路由挂载到app容器中
 app.use(router);

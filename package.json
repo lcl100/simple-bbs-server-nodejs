@@ -15,6 +15,7 @@
     "express": "^4.17.1",
     "express-art-template": "^1.0.1",
     "express-fileupload": "^1.2.1",
+    "express-session": "^1.17.2",
     "md5": "^2.3.0",
     "mongoose": "^6.0.13"
   }

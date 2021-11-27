@@ -9,11 +9,12 @@ var router = express.Router();
 var userModel = require('./models/user.js');
 
 router.get('/', function (request, response) {
-    // 如果访问"/"则重定向到"/index"中
-    response.redirect('/index');
+    // 如果访问"/"则重定向到"/index.html"中
+    response.redirect('/index.html');
 });
 
-router.get('/index', function (request, response) {
+// 渲染首页
+router.get('/index.html', function (request, response) {
     response.render('index.html');
 });
 
@@ -22,8 +23,29 @@ router.get('/login.html', function (request, response) {
     response.render("login.html");
 });
 
-router.get('/login', function (request, response) {
-    response.render('login.html');
+// 登录请求处理
+router.post('/login', async function (request, response) {
+    // 获取请求数据
+    var postForm = request.body;
+    console.log(postForm);
+
+    // 对提交的数据进行校验
+    if (postForm.username === null || postForm.username.length < 3) {
+        return response.status(400).send({code: 400, msg: "用户名不能为空并且至少三个字符！"});
+    }
+    if (postForm.password === null || postForm.password.length < 6 || postForm.password.length > 18) {
+        return response.status(400).send({code: 400, msg: "密码不能为空并且长度在6到18个字符之间！"});
+    }
+
+    // 根据用户名和密码在mongodb数据库中查询，如果查询到结果表示有用户则登录成功，否则提示前去注册
+    var checkedUser = await userModel.selectByUsernameAndPassword(postForm.username, md5(postForm.password));// 注意，数据库中的密码是已经经过md5加密的，所以也需要加密后去对比查询
+    if (checkedUser != null) {
+        // 登录成功后，将用户信息保存到session中
+        request.session.user = checkedUser;
+        return response.send({code: 200, msg: '登录成功！'});
+    } else {
+        return response.status(400).send({code: 400, msg: '用户名或密码不正确！'})
+    }
 });
 
 // 渲染register.html页面
@@ -31,6 +53,7 @@ router.get('/register.html', function (request, response) {
     response.render('register.html');
 });
 
+// 注册请求处理
 router.post('/register', async function (request, response) {
     // 获取请求数据
     var files = request.files;// POST请求上传的头像文件
@@ -102,23 +125,21 @@ router.get('/detail', function (request, response) {
     response.render('detail.html');
 });
 
+router.get('/publish.html', function (request, response) {
+    // 该页面只有登录用户才能访问，所以验证session判断是否登录
+    if (request.session.user != null) {
+        response.render('publish.html');
+    } else {
+        response.status(400).send('请登录');
+    }
+});
+
 router.get('/publish', function (request, response) {
-    response.render('publish.html');
+    response.send('发布话题...');
 });
 
 router.get('/test', async function (request, response) {
-    var user = {
-        username: '赵六',
-        password: '753159',
-        avatar: './img/avatar.jpg',
-        gender: -1,
-        introduction: '我是用户赵六',
-        registerDate: new Date()
-    };
-    var result = await userModel.selectByUsername('赵六1');
-    response.send(result === null);
-    // var result=await userModel.insert(user);
-    // response.send(result);
+    response.send(request.session.user);
 });
 
 // 3.把router暴露出去
