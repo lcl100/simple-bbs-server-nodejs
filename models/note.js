@@ -22,7 +22,8 @@ var noteSchema = mongoose.Schema({
     // 帖子浏览数
     viewCount:{
         type:Number,
-        require:0
+        require:0,
+        default:0
     },
     // 插入日期
     insertDate: {
@@ -122,6 +123,22 @@ module.exports = {
                 }
                 resolve(doc);
             });
+        });
+    },
+    /**
+     * 根据帖子id更新帖子的浏览量
+     * @param noteId 帖子id
+     * @param note 待更新的字段，是一个对象
+     * @returns {Promise<any>} 含更新结果集的Promise对象
+     */
+    updateViewCountByNoteId(noteId, note) {
+        return new Promise(function (resolve, reject) {
+            Note.findByIdAndUpdate(noteId, note, function (err, doc) {
+                if (err) {
+                    reject(err);
+                }
+                resolve(doc);
+            })
         });
     }
 };

@@ -95,13 +95,13 @@
             var toast = new bootstrap.Toast(totalLiveExample);
             var toastBody = document.getElementById("toast-body");
             if (response.status === 200) {
-                toastBody.innerHTML = "<span class='text-primary'>" + response.data.msg + "将在10秒后自动前往首页！" + "</span><br/>立即前往<a href='./index.html'>首页</a>";
+                toastBody.innerHTML = "<span class='text-primary'>" + response.data.msg + "将在3秒后自动前往首页！" + "</span><br/>立即前往<a href='./index.html'>首页</a>";
                 // 注册成功则清除表单数据并且在10秒后重定向到登录页面
                 document.getElementById("username").value = null;
                 document.getElementById("password").value = null;
                 setTimeout(function () {
                     window.location.href = './index.html';
-                }, 10 * 1000);
+                }, 3 * 1000);
             } else if (response.status === 400) {
                 toastBody.innerHTML = "<span class='text-warning'>" + response.data.msg + "</span>";
             } else if (response.status === 500) {

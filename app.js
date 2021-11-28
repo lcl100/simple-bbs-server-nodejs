@@ -23,7 +23,9 @@ app.use(session({
     secret: '12345',
     name: 'session',
     resave: false,
-    cookie: {maxAge: 60000},
+    cookie: {
+        maxAge: 3*24*60*60*1000 // maxAge设置session的有效保存时间，单位为毫秒
+    },
     saveUninitialized: true
 }));
 

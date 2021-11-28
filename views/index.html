@@ -97,7 +97,7 @@
                                                    href="./publish.html?id={{$value.note.id}}">编辑</a>
                                             </li>
                                             <li>
-                                                <a class="dropdown-item" href="/delete?id={{$value.note.id}}">删除</a>
+                                                <a class="dropdown-item" href="/note/delete?id={{$value.note.id}}">删除</a>
                                             </li>
                                         </ul>
                                     </li>
@@ -120,32 +120,5 @@
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl)
     });
-
-    // 初始化
-    // window.onload = function () {
-    //     // 根据是否登录来决定.login-show-item和.not-login-show-item标签的显示情况
-    //     axios.get('/isLogin').then(function (response) {
-    //         console.log(response.data);
-    //         if (response.data.data) {
-    //             // 如果处于登录状态，则让class='login-show-item'的标签处于隐藏状态
-    //             var loginItems = document.getElementsByClassName('login-show-item');
-    //             for (var i in loginItems) {
-    //                 if (loginItems[i].style !== undefined) {
-    //                     loginItems[i].style.display = "none";
-    //                 }
-    //             }
-    //         } else {
-    //             // 如果处于非登录状态，则让class='not-login-show-item'的标签处于隐藏状态
-    //             var notLoginItems = document.getElementsByClassName('not-login-show-item');
-    //             for (var i in notLoginItems) {
-    //                 if (notLoginItems[i].style !== undefined) {
-    //                     notLoginItems[i].style.display = "none";
-    //                 }
-    //             }
-    //         }
-    //     }).catch(function (reason) {
-    //         console.log(reason);
-    //     });
-    // }
 </script>
 </html>

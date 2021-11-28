@@ -28,7 +28,6 @@ router.get('/index.html', async function (request, response) {
     }
     var newNotes = notes.map(async item => {
         var user = await userModel.selectById(item.userId);
-        console.log(item);
         return {
             note: {
                 id: item._id.toString().replace('"', ''),// 会多一对双引号，所以特殊处理
@@ -39,7 +38,7 @@ router.get('/index.html', async function (request, response) {
                 insertDate: formatDate(item.insertDate)
             },
             user: {
-                id: user._id.toString().replace('"', ''),
+                id: user._id.toString().replace(/"/g, ''),
                 username: user.username,
                 avatar: user.avatar,
                 gender: user.gender === -1 ? '保密' : (user.gender === 0 ? '男' : '女'),
@@ -56,7 +55,7 @@ router.get('/index.html', async function (request, response) {
         res.push(await newNotes[i])
     }
     response.render('index.html', {
-        isLogin: request.session.user != null,
+        isLogin: request.session.user !== undefined,
         notes: res,
         user: request.session.user != null ? request.session.user[0] : null
     });
@@ -75,7 +74,6 @@ router.get('/login.html', function (request, response) {
 router.post('/login', async function (request, response) {
     // 获取请求数据
     var postForm = request.body;
-    console.log(postForm);
 
     // 对提交的数据进行校验
     if (postForm.username === null || postForm.username.length < 3) {
@@ -89,6 +87,7 @@ router.post('/login', async function (request, response) {
     var checkedUser = await userModel.selectByUsernameAndPassword(postForm.username, md5(postForm.password));// 注意，数据库中的密码是已经经过md5加密的，所以也需要加密后去对比查询
     if (checkedUser != null) {
         // 登录成功后，将用户信息保存到session中
+        checkedUser.password = null;
         request.session.user = checkedUser;
         return response.send({code: 200, msg: '登录成功！'});
     } else {
@@ -205,8 +204,63 @@ router.get('/getUser', function (request, response) {
 });
 
 // 渲染detail.html页面
-router.get('/detail.html', function (request, response) {
-    response.render('detail.html');
+router.get('/detail.html', async function (request, response, next) {
+    if (request.query.id != null) {
+        var noteId = request.query.id;
+        var note = await noteModel.selectById(noteId);// 获取指定id的帖子
+        // 每访问一次，浏览量都会加1
+        var viewCount = note.viewCount;
+        viewCount++;
+        var updateResult = await noteModel.updateViewCountByNoteId(noteId, {viewCount: viewCount});// 更新浏览量
+        var comments = await commentModel.selectByNoteId(noteId);// 获取该帖子下的所有留言
+        var commentCount = await commentModel.getCommentCountByNoteId(noteId);// 获取该帖子的留言总数
+        var user = await userModel.selectById(note.userId);// 根据用户id获取用户信息
+        var newComments = comments.map(async item => {
+            var user = await userModel.selectById(item.userId);
+            return {
+                comment: {
+                    id: item._id.toString().replace(/"/g, ''),
+                    userId: item.userId,
+                    content: item.content,
+                    noteId: item.noteId,
+                    insertDate: formatDate(item.insertDate)
+                },
+                user: {
+                    id: user._id.toString().replace(/"/g, ''),
+                    username: user.username,
+                    avatar: user.avatar,
+                    gender: user.gender === -1 ? '保密' : (user.gender === 0 ? '男' : '女'),
+                    introduction: user.introduction,
+                    registerDate: formatDate(user.registerDate)
+                }
+            }
+        });
+        // newComments是一个Promise对象数组，所以要提取其中的成功结果
+        var res = [];
+        for (var i in newComments) {
+            res.push(await newComments[i])
+        }
+        // 渲染detail.html页面
+        response.render('detail.html', {
+            user: {
+                id: user._id.toString().replace(/"/g, ''),
+                username: user.username,
+                avatar: user.avatar,
+                gender: user.gender === -1 ? '保密' : (user.gender === 0 ? '男' : '女'),
+                introduction: user.introduction,
+                registerDate: formatDate(user.registerDate)
+            },
+            note: note,
+            comment: {
+                commentCount: commentCount
+            },
+            comments: res,
+            isLogin: request.session.user !== undefined,
+            loginUserId: request.session.user !== undefined ? request.session.user[0]._id : null
+        });
+    } else {
+        next();
+    }
 });
 
 // 渲染publish.html页面
@@ -227,6 +281,7 @@ router.get('/publish.html', async function (request, response) {
     }
 });
 
+// 发布帖子
 router.post('/publish', function (request, response) {
     // 判断是否登录
     if (request.session.user === null) {
@@ -262,7 +317,6 @@ router.post('/publish', function (request, response) {
 
 // 编辑帖子
 router.post('/note/edit', function (request, response) {
-    console.log(request.body);
     // 判断是否登录
     if (request.session.user === null) {
         return response.status(400).send({code: 400, msg: '未登录！', data: null});
@@ -296,9 +350,49 @@ router.post('/note/edit', function (request, response) {
     }
 });
 
+// 删除帖子，同时要删除帖子下的所有留言
+router.get('/note/delete', async function (request, response) {
+    // 判断是否登录
+    if (request.session.user === null) {
+        return response.status(400).send({code: 400, msg: '未登录！', data: null});
+    } else {
+        // 获取待删除的帖子id
+        var noteId = request.query.id;
+        // 删除帖子
+        await noteModel.deleteById(noteId);
+        // 删除帖子下的所有留言
+        await commentModel.deleteByNoteId(noteId);
+        response.redirect('/index.html');
+    }
+});
+
+// 发布留言
+router.post('/comment/publish', function (request, response) {
+    if (request.session.user === undefined) {
+        return response.status(400).send({code: 400, msg: '未登录！', data: null});
+    } else {
+        // 参数校验
+        if (request.body.content === null || request.body.content.length === 0) {
+            return response.status(400).send({code: 400, msg: '留言不能为空！'});
+        }
+        // 插入到数据库
+        commentModel.insert({
+            userId: request.session.user[0]._id,
+            content: request.body.content,
+            noteId: request.body.noteId,
+            insertDate: new Date()
+        }).then(function (ret) {
+            response.redirect('/detail.html?id=' + request.body.noteId);
+        }).catch(function (err) {
+            console.log(err);
+            return response.status(500).send({code: 500, msg: '发布留言失败！'});
+        });
+    }
+});
+
 function formatDate(date) {
     if (date !== undefined) {
-        return date.getFullYear() + '-' + date.getMonth() + '-' + date.getDay() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
+        return date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
     }
     return null;
 }

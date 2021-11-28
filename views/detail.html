@@ -25,9 +25,11 @@
                 <i class="bi bi-list"></i>
             </a>
             <ul class="dropdown-menu">
+                {{if !isLogin}}
                 <!-- 如果未登录则显示下面的列表项 -->
                 <li class="login-show-item"><a class="dropdown-item" href="./login.html">登录</a></li>
                 <li class="login-show-item"><a class="dropdown-item" href="./register.html">注册</a></li>
+                {{else}}
                 <!-- 如果已登录，则显示下面的列表项 -->
                 <li class="not-login-show-item"><a class="dropdown-item" href="./index.html">个人主页</a></li>
                 <li class="not-login-show-item">
@@ -35,6 +37,7 @@
                 </li>
                 <li class="not-login-show-item"><a class="dropdown-item" href="./publish.html">发表话题</a></li>
                 <li class="not-login-show-item"><a class="dropdown-item" href="/logout">登出</a></li>
+                {{/if}}
             </ul>
         </li>
     </ul>
@@ -46,9 +49,9 @@
     <div class="row justify-content-md-center">
         <!-- 发言人头像 -->
         <div class="col-sm-2">
-            <a href="/author?id=123">
-                <img src="../public/img/avatar.jpg" class="img-thumbnail avatar" alt="头像" data-bs-toggle="tooltip"
-                     data-bs-placement="bottom" title="123456 | 女"/>
+            <a href="./index.html?author={{note.userId}}">
+                <img src="{{user.avatar}}" class="img-thumbnail avatar" alt="头像" data-bs-toggle="tooltip"
+                     data-bs-placement="bottom" title="{{user.username}} | {{user.gender}}"/>
             </a>
         </div>
         <!-- 发言人发布的内容面板 -->
@@ -56,29 +59,32 @@
             <div class="card">
                 <div class="card-body">
                     <div class="container">
+                        <!-- 帖子id -->
+                        <input type="text" id="noteId" name="noteId" value="{{note.id}}" hidden>
                         <!-- 标题 -->
                         <div class="row">
                             <h5 class="card-title">
-                                <a href="./detail.html">myblog</a>
+                                <a href="./detail.html?id={{note.id}}">{{note.title}}</a>
                             </h5>
                         </div>
                         <!-- 具体内容 -->
                         <div class="row card-content">
-                            <p class="card-text">With supporting text below as a natural lead-in to additional
-                                content.</p>
+                            <p class="card-text">{{note.content}}</p>
                         </div>
                         <!-- 其他 -->
                         <div class="row">
                             <!-- 发布日期 -->
                             <div class="col-sm-4">
-                                <p class="text-start"><span>2021-11-20 17:16</span></p>
+                                <p class="text-start"><span>{{note.insertDate}}</span></p>
                             </div>
                             <div class="col-sm-5"></div>
                             <div class="col-sm-3">
                                 <!-- 浏览次数 -->
-                                <span class="view">浏览(2)</span>
+                                <span class="view">浏览({{note.viewCount}})</span>
                                 <!-- 留言数 -->
-                                <span class="say">留言(0)</span>
+                                <span class="say">留言({{comment.commentCount}})</span>
+                                <!-- 下面的判断要求只有当用户登录并且当前帖子的用户id和已登录用户id相同时才具有编辑和删除的权限，否则不显示 -->
+                                {{if isLogin&&user.id===(loginUserId!=null?loginUserId:null)}}
                                 <!-- 删除和编辑操作 -->
                                 <ul class="nav nav-pills edit">
                                     <li class="nav-item dropdown">
@@ -86,14 +92,15 @@
                                         <ul class="dropdown-menu">
                                             <!-- 如果未登录则显示下面的列表项 -->
                                             <li>
-                                                <a class="dropdown-item" href="publish.html">编辑</a>
+                                                <a class="dropdown-item" href="./publish.html?id={{note.id}}">编辑</a>
                                             </li>
                                             <li>
-                                                <a class="dropdown-item" href="#">删除</a>
+                                                <a class="dropdown-item" href="/note/delete?id={{note.id}}">删除</a>
                                             </li>
                                         </ul>
                                     </li>
                                 </ul>
+                                {{/if}}
                             </div>
                         </div>
                     </div>
@@ -112,63 +119,32 @@
                 </div>
                 <div class="card-body">
                     <div>
+                        {{each comments}}
                         <!-- 每一条留言 -->
                         <div class="row message-item">
                             <div class="col-sm-2">
-                                <img src="../public/img/avatar.jpg" class="img-thumbnail" alt="头像"/>
+                                <img src="{{$value.user.avatar}}" class="img-thumbnail" alt="头像"/>
                             </div>
                             <div class="col-sm-10">
                                 <p>
-                                    <span><a href="/author?id=123">123</a></span>
-                                    <span class="publish-date">2021-11-15 23:48</span>
+                                    <span><a
+                                            href="/index.html?author={{$value.user.id}}">{{$value.user.username}}</a></span>
+                                    <span class="publish-date">{{$value.comment.insertDate}}</span>
                                 </p>
-                                <p>我是留言，留言。</p>
+                                <p>{{$value.comment.content}}</p>
                             </div>
                         </div>
-                        <!-- 每一条留言 -->
-                        <div class="row message-item">
-                            <div class="col-sm-2">
-                                <img src="../public/img/avatar.jpg" class="img-thumbnail" alt="头像"/>
-                            </div>
-                            <div class="col-sm-10">
-                                <p>
-                                    <span><a href="/author?id=123">123</a></span>
-                                    <span class="publish-date">2021-11-15 23:48</span>
-                                </p>
-                                <p>我是留言，留言。</p>
-                            </div>
-                        </div>
-                        <!-- 每一条留言 -->
-                        <div class="row message-item">
-                            <div class="col-sm-2">
-                                <img src="../public/img/avatar.jpg" class="img-thumbnail" alt="头像"/>
-                            </div>
-                            <div class="col-sm-10">
-                                <p>
-                                    <span><a href="/author?id=123">123</a></span>
-                                    <span class="publish-date">2021-11-15 23:48</span>
-                                </p>
-                                <p>我是留言，留言。</p>
-                            </div>
-                        </div>
-                        <!-- 每一条留言 -->
-                        <div class="row message-item">
-                            <div class="col-sm-2">
-                                <img src="../public/img/avatar.jpg" class="img-thumbnail" alt="头像"/>
-                            </div>
-                            <div class="col-sm-10">
-                                <p>
-                                    <span><a href="/author?id=123">123</a></span>
-                                    <span class="publish-date">2021-11-15 23:48</span>
-                                </p>
-                                <p>我是留言，留言。</p>
-                            </div>
-                        </div>
+                        {{/each}}
+                        {{if isLogin}}
                         <!-- 发表留言面板（注意，需要用户登录后才能发表留言，所以下面的页面需要登录才显示） -->
                         <div class="row" id="publish-message-panel">
-                            <textarea class="form-control" cols="5" rows="5" placeholder="登录后才能留言..."></textarea>
-                            <button type="button" class="btn btn-primary publish-message-button">留言</button>
+                            <textarea class="form-control" cols="5" rows="5" placeholder="登录后才能留言..."
+                                      id="comment"></textarea>
+                            <button type="button" class="btn btn-primary publish-message-button" id="comment-button">
+                                留言
+                            </button>
                         </div>
+                        {{/if}}
                     </div>
                 </div>
             </div>
@@ -190,32 +166,19 @@
         return new bootstrap.Popover(popoverTriggerEl)
     });
 
-    // 初始化，根据是否登录来决定.login-show-item和.not-login-show-item标签的显示情况
-    window.onload = function () {
-        axios.get('/isLogin').then(function (response) {
-            console.log(response.data);
-            if (response.data.data) {
-                // 如果处于登录状态，则让class='login-show-item'的标签处于隐藏状态
-                var loginItems = document.getElementsByClassName('login-show-item');
-                for (var i in loginItems) {
-                    if (loginItems[i].style !== undefined) {
-                        loginItems[i].style.display = "none";
-                    }
-                }
-            } else {
-                // 如果处于非登录状态，则让class='not-login-show-item'的标签处于隐藏状态
-                var notLoginItems = document.getElementsByClassName('not-login-show-item');
-                for (var i in notLoginItems) {
-                    if (notLoginItems[i].style !== undefined) {
-                        notLoginItems[i].style.display = "none";
-                    }
-                }
-                // 处于非登录状态则不能进行留言
-                document.getElementById('publish-message-panel').style.display="none";
-            }
-        }).catch(function (reason) {
-            console.log(reason);
-        });
-    };
+    // 发布留言按钮事件
+    if (document.getElementById('comment-button') !== null) {
+        document.getElementById('comment-button').onclick = function () {
+            var comment = document.getElementById('comment').value;// 留言内容
+            var noteId = document.getElementById('noteId').value;// 被留言的帖子id
+            axios.post('/comment/publish', {content: comment, noteId: noteId}).then(function (response) {
+                // 在提交留言后刷新当前页面
+                document.getElementById('comment').value=null;
+                window.location.reload();
+            }).catch(function (reason) {
+                console.log(reason);
+            });
+        }
+    }
 </script>
 </html>
