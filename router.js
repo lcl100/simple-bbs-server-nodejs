@@ -54,8 +54,13 @@ router.get('/index.html', async function (request, response) {
     for (var i in newNotes) {
         res.push(await newNotes[i])
     }
+    // 判断是否登录
+    var isLogin = false;
+    if (request.session.user !== undefined && request.session.user !== null) {
+        isLogin = true;
+    }
     response.render('index.html', {
-        isLogin: request.session.user !== undefined,
+        isLogin: isLogin,
         notes: res,
         user: request.session.user != null ? request.session.user[0] : null
     });
