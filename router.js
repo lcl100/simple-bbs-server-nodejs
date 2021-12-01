@@ -85,7 +85,7 @@ router.post('/login', async function (request, response) {
 
     // 根据用户名和密码在mongodb数据库中查询，如果查询到结果表示有用户则登录成功，否则提示前去注册
     var checkedUser = await userModel.selectByUsernameAndPassword(postForm.username, md5(postForm.password));// 注意，数据库中的密码是已经经过md5加密的，所以也需要加密后去对比查询
-    if (checkedUser != null) {
+    if (checkedUser != null && checkedUser.length === 1) {// checkedUser是一个数组
         // 登录成功后，将用户信息保存到session中
         checkedUser.password = null;
         request.session.user = checkedUser;
